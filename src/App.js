@@ -1,54 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
-import axios from 'axios'
-import { useState } from 'react'
-function App() {
-  const [profileData, setProfileDatga] = useState(null);
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import axios from 'axios';
 
-  function getData() {
-    axios({
-      method: 'GET',
-      url: '/profile'
-    }).then((response) => {
-      const res = response.data
-      console.log(res)
-      setProfileDatga(({
-        profile_name: res.name,
-        about: res.about
-      })).catch((error) => {
-        if (error.response) {
-          console.log(error.response)
-          console.log(error.response.status)
-          console.log(error.response.headers)
-        }
-      })
-    })
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Link
+} from "react-router-dom";
+
+function App() {
+  const [user, setUser] = useState({})
+  const userId = localStorage.getItem('logged in id')
+  const userName = localStorage.getItem('logged in name')
+  const userEmail = localStorage.getItem('useremail')
+
+  const NotFound = () => {
+    return (
+      <div>
+            <h1>Oops! You seem to be lost.</h1>
+            <p>Here are some helpful links:</p>
+            <Link to='/'>Home</Link>
+            <br></br>
+            <Link to='/login'>Log in</Link>
+            <br></br>
+            <Link to='/signup'>Create a new account</Link>
+        </div>
+    )
   }
+
+
+  const router = createBrowserRouter([
+    {
+      path: "/signup",
+      element: <Signup/>
+    },
+    {
+      path: "/login",
+      element: <Login setUser={setUser}/>
+    },
+    {
+      path: '*',
+      element: <NotFound />
+    }
+  ]);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <p>To get the profile details: </p>
-        <button onClick={getData}>Click me</button>
-        {
-          profileData && <div>
-            <p>Profile name: {profileData.profile_name}</p>
-            <p>About: {profileData.about}</p>
-          </div>
-        }
-      </header>
-    </div>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
   );
 }
 
